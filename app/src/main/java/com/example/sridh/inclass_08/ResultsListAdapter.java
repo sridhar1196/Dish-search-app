@@ -4,10 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +28,7 @@ public class ResultsListAdapter extends RecyclerView.Adapter<ResultsListAdapter.
     FirstFragment context;
     int oResourse;
     passData pass;
+    String editedtext;
 
     public ResultsListAdapter(@NonNull FirstFragment context, int oResourse, @NonNull ArrayList<String> objects) {
         this.list = objects;
@@ -52,13 +58,6 @@ public class ResultsListAdapter extends RecyclerView.Adapter<ResultsListAdapter.
         if(position == (list.size() - 1)){
             holder.image.setImageResource(R.drawable.add);
         }
-//        for(int x =0;x<list.size();x++){
-//            if(x == (list.size() - 1)){
-//                holder.image.setImageResource(R.drawable.add);
-//            } else {
-//                holder.image.setImageResource(R.drawable.remove);
-//            }
-//        }
         holder.position = position;
         holder.pass = pass;
     }
@@ -85,24 +84,24 @@ public class ResultsListAdapter extends RecyclerView.Adapter<ResultsListAdapter.
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    Log.d("demo",list.toString());
+                    Log.d("demo","position:"+position);
                     if((list.size() - 1) == position){
                         if(list.size() == 5){
-                            list.set(position,receipe.getText().toString());
                             Toast.makeText(context.getContext(),"Maximum 5 ingredients can be added",Toast.LENGTH_SHORT).show();
                         } else {
                             list.set(position,receipe.getText().toString());
-                            list.add(" ");
-                            if(list != null){
-                                context.setIngredients(list);
-                            }
+                            list.add("");
                             ResultsListAdapter.this.notifyDataSetChanged();
                         }
 
                     } else {
-                        list.remove(position);
-                        if(list != null){
-                            context.setIngredients(list);
+                        ArrayList<String> temp = new ArrayList<String>();
+                        temp.addAll(context.listview1());
+                        for(int x =0;x<temp.size();x++){
+                            list.set(x,temp.get(x));
                         }
+                        list.remove(position);
                         ResultsListAdapter.this.notifyDataSetChanged();
                     }
                 }

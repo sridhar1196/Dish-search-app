@@ -39,7 +39,6 @@ public class GetData extends AsyncTask<String,Void,ArrayList<Recipe>> {
     @Override
     protected void onPostExecute(ArrayList<Recipe> favorites) {
         super.onPostExecute(favorites);
-        Log.d("demo",favorites.toString());
         response.processFinish(favorites);
     }
 
@@ -47,7 +46,6 @@ public class GetData extends AsyncTask<String,Void,ArrayList<Recipe>> {
     protected ArrayList<Recipe> doInBackground(String... strings) {
         try {
             URL url = new URL(strings[0]);
-            Log.d("URL","Value"+strings[0]);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.connect();

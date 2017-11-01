@@ -1,8 +1,7 @@
 package com.example.sridh.inclass_08;
 
-import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,12 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -32,6 +30,9 @@ public class FirstFragment extends Fragment implements ResultsListAdapter.passDa
     ArrayList<Recipe> recipes = new ArrayList<Recipe>();
     String url="http://www.recipepuppy.com/api/";
     String dishname="";
+    RecyclerView.LayoutManager mLayoutManager;
+    RecyclerView.Adapter mAdapter;
+    RecyclerView mRecyclerView;
     OnFragmentInteractionListener fragmentInteractionListener;
     ArrayList<Recipe> finalRecipe=new ArrayList<Recipe>();
     public ArrayList<String> ingredients=new ArrayList<String>();
@@ -62,9 +63,9 @@ public class FirstFragment extends Fragment implements ResultsListAdapter.passDa
 
         View view = inflater.inflate(R.layout.fragment_first,container, false);
         ingredients.add("");
-        RecyclerView.LayoutManager mLayoutManager;
-        RecyclerView.Adapter mAdapter;
-        RecyclerView mRecyclerView = (RecyclerView) view.findViewById(R.id.resultsListView);
+        //RecyclerView.LayoutManager mLayoutManager;
+        //RecyclerView.Adapter mAdapter;
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.resultsListView);
 
         mRecyclerView.setHasFixedSize(true);
 
@@ -74,13 +75,8 @@ public class FirstFragment extends Fragment implements ResultsListAdapter.passDa
 
         // specify an adapter (see also next example)
         mAdapter = new ResultsListAdapter(FirstFragment.this, R.layout.results, ingredients);
-        mRecyclerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         mRecyclerView.setAdapter(mAdapter);
+        List<ContentValues> list = new ArrayList<>();
         view.findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,21 +85,32 @@ public class FirstFragment extends Fragment implements ResultsListAdapter.passDa
                 if(dishname.trim().isEmpty()){
                     Toast.makeText(getActivity(),"Empty dish name",Toast.LENGTH_SHORT).show();
                 } else {
-
+//                    int size = mAdapter.getItemCount();
+//                    for(int x =0 ;x<size;x++){
+//                        int itemId = (int) mAdapter.getItemId(x);
+//                        View view1 = mRecyclerView.findViewById(itemId);
+//                    }
+                    url="http://www.recipepuppy.com/api/";
+                    Boolean first = false;
                     for(int i=0;i<ingredients.size();i++)
                     {
-                        if(i==0)
-                        {
-                            url+="?i=";
+                        if(!(ingredients.get(i).trim().isEmpty())){
+                            if (first){
+                                url+=",";
+                                url+=ingredients.get(i).trim();
+                            } else {
+                                url+="?i=";
+                                first = true;
+                                url+=ingredients.get(i).trim();
+                            }
                         }
-                        else {
-                            url+=",";
-                        }
-
-                        url+=ingredients.get(i).trim();
 
                     }
-                    url+="&q=";
+                    if(first){
+                        url+="&q=";
+                    } else {
+                        url+="?&q=";
+                    }
                     url+=dishname.trim();
 
                     Log.d("demo",url);
@@ -111,8 +118,13 @@ public class FirstFragment extends Fragment implements ResultsListAdapter.passDa
 
                         @Override
                         public void processFinish(ArrayList<Recipe> musicList) {
-                            Toast.makeText(getActivity(),musicList.toString(),Toast.LENGTH_SHORT).show();
-                            fragmentInteractionListener.onFragmentInteraction(musicList);
+                            if(musicList == null){
+                                Toast.makeText(getActivity(),"Empty search result",Toast.LENGTH_SHORT).show();
+                            } else if(musicList.size() == 0){
+                                Toast.makeText(getActivity(),"Empty search result",Toast.LENGTH_SHORT).show();
+                            } else {
+                                mListener.onFragmentInteraction(musicList);
+                            }
                         }
                     }).execute(url);
                 }
@@ -123,7 +135,17 @@ public class FirstFragment extends Fragment implements ResultsListAdapter.passDa
 
     }
 
-
+    public ArrayList<String> listview1(){
+        int count = mRecyclerView.getChildCount();
+        ingredients.clear();
+        for(int x = 0;x<count;x++){
+            View view1 = mRecyclerView.getChildAt(x);
+            EditText e1 = (EditText) view1.findViewById(R.id.edit_value);
+            ingredients.add(e1.getText().toString());
+        }
+        Log.d("demo","ingredients:"+ingredients.toString());
+        return ingredients;
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

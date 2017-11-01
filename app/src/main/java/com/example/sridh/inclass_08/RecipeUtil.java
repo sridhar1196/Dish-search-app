@@ -21,12 +21,12 @@ public class RecipeUtil {
             for (int i = 0; i < recipesJSONArray.length(); i++){
                 JSONObject recipesJSONObject=recipesJSONArray.getJSONObject(i);
                 Recipe recipe=new Recipe();
-                recipe.setTitle(recipesJSONObject.getString("title"));
+                recipe.setTitle(recipesJSONObject.getString("title").trim());
                 //Log.d("demo",recipe.getTitle());
-                recipe.setHref(recipesJSONObject.getString("href"));
-                recipe.setIngredients(recipesJSONObject.getString("ingredients"));
-                recipe.setThumbnail(recipesJSONObject.getString("thumbnail"));
-                recipe.imageUrls.add(recipe.getThumbnail());
+                recipe.setHref(recipesJSONObject.getString("href").trim());
+                recipe.setIngredients(recipesJSONObject.getString("ingredients").trim());
+                recipe.setThumbnail(recipesJSONObject.getString("thumbnail").trim());
+                recipe.imageUrls.add(recipe.getThumbnail().trim());
                 recipesList.add(recipe);
             }
             return recipesList;
